@@ -52,9 +52,18 @@ def snowfall_rate_to_rainfall_rate(snowfall_rate: float, terminal_velocity: floa
     rainfall_rate:              Varies from 0.5 (slight rain) to 50 (violent shower)    [mm/h]
     """
 
-    rainfall_rate = np.sqrt((snowfall_rate / (487 * snowflake_density * snowflake_diameter * terminal_velocity))**3)
-
-    return rainfall_rate
+    return np.sqrt(
+        (
+            snowfall_rate
+            / (
+                487
+                * snowflake_density
+                * snowflake_diameter
+                * terminal_velocity
+            )
+        )
+        ** 3
+    )
 
 def estimate_laser_parameters(pointcloud_planes, calculated_indicent_angle, power_factor=15, noise_floor=0.7,
                               debug=True, estimation_method='linear'):
@@ -109,10 +118,7 @@ def estimate_laser_parameters(pointcloud_planes, calculated_indicent_angle, powe
         adaptive_noise_threshold = noise_floor * (
                 pmin[0] * distance ** 2 + pmin[1] * distance + pmin[2])
     elif estimation_method == 'linear':
-        if len(min_vals) > 3:
-            pmin = linregress(x, min_vals)
-        else:
-            pmin = p
+        pmin = linregress(x, min_vals) if len(min_vals) > 3 else p
         adaptive_noise_threshold = noise_floor * (
                 pmin[0] * distance + pmin[1])
     # Guess that noise level should be half the road relfection
@@ -189,9 +195,7 @@ def get_fov_flag(pts_rect, img_shape, calib):
     val_flag_1 = np.logical_and(pts_img[:, 0] >= 0, pts_img[:, 0] < img_shape[1])
     val_flag_2 = np.logical_and(pts_img[:, 1] >= 0, pts_img[:, 1] < img_shape[0])
     val_flag_merge = np.logical_and(val_flag_1, val_flag_2)
-    pts_valid_flag = np.logical_and(val_flag_merge, pts_rect_depth >= 0)
-
-    return pts_valid_flag
+    return np.logical_and(val_flag_merge, pts_rect_depth >= 0)
 
 
 def process_single_channel(root_path: str, particle_file_prefix: str, orig_pc: np.ndarray, beam_divergence: float,
@@ -225,7 +229,7 @@ def process_single_channel(root_path: str, particle_file_prefix: str, orig_pc: n
     particle_file = f'{particle_file_prefix}_{index + 1}.npy'
 
     channel_mask = orig_pc[:, 4] == channel
-    idx = np.where(channel_mask == True)[0]
+    idx = np.where(channel_mask)[0]
 
     pc = orig_pc[channel_mask]
     N = pc.shape[0]
@@ -266,11 +270,7 @@ def process_single_channel(root_path: str, particle_file_prefix: str, orig_pc: n
         d_orig = distance[j]
         i_orig = intensity[j]
 
-        if channel in [53, 55, 56, 58]:
-            max_intensity = 230
-        else:
-            max_intensity = 255
-
+        max_intensity = 230 if channel in {53, 55, 56, 58} else 255
         i_adjusted = i_orig - 255 * focal_slope * np.abs(focal_offset - (1 - d_orig/120)**2)
         i_adjusted = np.clip(i_adjusted, 0, max_intensity)      # to make sure we don't get negative values
 
@@ -727,9 +727,9 @@ def augment(pc: np.ndarray, particle_file_prefix: str, beam_divergence: float, s
 
 def received_power(CA_P0: float, beta_0: float, ratio: float, r: float, r_j: float, tau_h: float) -> float:
 
-    answer = ((CA_P0 * beta_0 * ratio * xsi(r_j)) / (r_j ** 2)) * np.sin((PI * (r - r_j)) / (c * tau_h)) ** 2
-
-    return answer
+    return ((CA_P0 * beta_0 * ratio * xsi(r_j)) / (r_j**2)) * np.sin(
+        (PI * (r - r_j)) / (c * tau_h)
+    ) ** 2
 
 def xsi(R: float, R_1: float = 0.9, R_2: float = 1.0) -> float:
 
@@ -741,13 +741,11 @@ def xsi(R: float, R_1: float = 0.9, R_2: float = 1.0) -> float:
 
         return 1
 
-    else:           # emitted ligth beam from the tansmitter is partly captured by the receiver
+    else:       # emitted ligth beam from the tansmitter is partly captured by the receiver
 
         m = (1 - 0) / (R_2 - R_1)
         b = 0 - (m * R_1)
-        y = m * R + b
-
-        return y
+        return m * R + b
 
 
 
@@ -762,13 +760,11 @@ def parse_arguments():
     parser.add_argument('-d', '--dst_folder', help='savefolder of dataset', type=str,
                         default='./save_root/snow/light')  # ['light','moderate','heavy']
     parser.add_argument('-s', '--snowfall_rate', help='snowfall rate', type=str,
-                        default= '0.5')  
+                        default= '0.5')
     parser.add_argument('-t', '--terminal_velocity', help='terminal velocity', type=str,
                         default= '2.0')  
 
-    arguments = parser.parse_args()
-
-    return arguments
+    return parser.parse_args()
 
 
 
@@ -784,14 +780,12 @@ if __name__ == '__main__':
     # light: snowfall_rate = '0.5' , terminal_velocity = '2.0'; moderate: snowfall_rate = '1.0', terminal_velocity = '1.6'; heavy: snowfall_rate = '2.5', terminal_velocity = '1.6' 
     rain_rate = snowfall_rate_to_rainfall_rate(float(snowfall_rate), float(terminal_velocity))
     occupancy = compute_occupancy(float(snowfall_rate), float(terminal_velocity))
-    snowflake_file_prefix = f'{mode}_{rain_rate}_{occupancy}'  
+    snowflake_file_prefix = f'{mode}_{rain_rate}_{occupancy}'
     all_files = []
     src_folder = os.path.join(args.root_folder, 'training/velodyne')
     val_txt = os.path.join(args.root_folder, 'ImageSets/val.txt')
     with open(val_txt, 'r') as f:
-        for line in f.readlines():
-            all_files.append(os.path.join(src_folder,line.strip()+'.bin'))
-
+        all_files.extend(os.path.join(src_folder, f'{line.strip()}.bin') for line in f)
     all_paths =  copy.deepcopy(all_files)
     dst_folder = args.dst_folder
     Path(dst_folder).mkdir(parents=True, exist_ok=True)
@@ -804,7 +798,7 @@ if __name__ == '__main__':
                 particle_file_prefix=snowflake_file_prefix, noise_floor=0.7,
                 beam_divergence=float(np.degrees(beam_divergence)),
                 shuffle=True, show_progressbar=True)
-        
+
         augmented_pointcloud[:, 3] = augmented_pointcloud[:, 3] / 255
         augmented_pointcloud = augmented_pointcloud[:, :4]
 

@@ -26,9 +26,7 @@ def parse_arguments():
     parser.add_argument('-d', '--dst_folder', help='savefolder of dataset', type=str,
                         default='./save_root/crosstalk/light')  # ['light','moderate','heavy']
     parser.add_argument('-p', '--percentage', help='crosstalk ratio', type=float, default=0.03)
-    arguments = parser.parse_args()
-
-    return arguments
+    return parser.parse_args()
 
 
 def lidar_crosstalk_noise(pointcloud, percentage):

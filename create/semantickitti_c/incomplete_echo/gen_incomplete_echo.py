@@ -32,9 +32,7 @@ def parse_arguments():
     parser.add_argument('-d', '--dst_folder', help='savefolder of dataset',
                         default='./save_root/incomplete_echo/light')  # ['light','moderate','heavy']
     parser.add_argument('-t', '--drop_ratio', help='drop ratio of instance points', type=float, default=0.75)
-    arguments = parser.parse_args()
-
-    return arguments
+    return parser.parse_args()
 
 
 

@@ -71,7 +71,9 @@ if socket.gethostname() == 'beast':
 
 def get_extracted_fog_file_list(dirname: str) -> List[str]:
 
-    file_list = [y for x in os.walk(dirname) for y in glob(os.path.join(x[0], f'*.bin'))]
+    file_list = [
+        y for x in os.walk(dirname) for y in glob(os.path.join(x[0], '*.bin'))
+    ]
 
     return sorted(file_list)
 

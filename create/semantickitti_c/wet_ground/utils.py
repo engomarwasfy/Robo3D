@@ -39,28 +39,16 @@ def read_meta_label(path):
     return data
 
 def filter_weather(meta, weather_type):
-    if meta['weather'][weather_type] == True:
-        return True
-    else:
-        return False
+    return meta['weather'][weather_type] == True
 
 def filter_env(meta, env_type):
-    if meta['meta']['environment'][env_type] == True:
-        return True
-    else:
-        return False
+    return meta['meta']['environment'][env_type] == True
 
 def filter_daytime(meta, day_type):
-    if meta['daytime'][day_type] == True:
-        return True
-    else:
-        return False
+    return meta['daytime'][day_type] == True
 
 def filter_infra(meta, infra_type):
-    if meta['meta']['infrastructure'][infra_type] == True:
-        return True
-    else:
-        return False
+    return meta['meta']['infrastructure'][infra_type] == True
 
 def read_road_wetness(path):
     try:

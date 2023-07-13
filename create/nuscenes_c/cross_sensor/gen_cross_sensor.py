@@ -28,9 +28,7 @@ def parse_arguments():
     parser.add_argument('-d', '--dst_folder', help='savefolder of dataset', type=str,
                         default='./save_root/cross_sensor/light')  # ['light','moderate','heavy']
     parser.add_argument('-n', '--num_beam_to_drop', help='number of beam to be dropped', type=int, default=8)
-    arguments = parser.parse_args()
-
-    return arguments
+    return parser.parse_args()
 
 
 

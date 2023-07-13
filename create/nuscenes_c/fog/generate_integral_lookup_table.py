@@ -43,10 +43,7 @@ def parse_arguments():
 
 def P_R_fog_soft_wrapper(p, R: float, n: int = None) -> float:
 
-    if R > p.r_0:
-        return 0            # skip unnecessary computation
-    else:
-        return P_R_fog_soft(p, R, n)
+    return 0 if R > p.r_0 else P_R_fog_soft(p, R, n)
 
 
 def generate_integral_lookup_tables(arguments) -> None:

@@ -308,13 +308,11 @@ def parse_arguments():
     parser.add_argument('-d', '--dst_folder', help='savefolder of dataset', type=str,
                         default='./save_root/fog/light')  # ['light','moderate','heavy']
     parser.add_argument('-i', '--inte_folder', help='INTEGRAL folder', type=str,
-                        default='integral_lookup_tables_seg_light_0.008beta') 
+                        default='integral_lookup_tables_seg_light_0.008beta')
     parser.add_argument('-b', '--beta', help='backscattering coefficient', type=float,
                         default=0.008) 
 
-    arguments = parser.parse_args()
-
-    return arguments
+    return parser.parse_args()
 
 if __name__ == '__main__':
     args = parse_arguments()
