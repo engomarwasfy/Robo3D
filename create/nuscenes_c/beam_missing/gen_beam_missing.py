@@ -26,9 +26,7 @@ def parse_arguments():
     parser.add_argument('-d', '--dst_folder', help='savefolder of dataset',
                         default='./save_root/beam_missing/light') # ['light','moderate','heavy']
     parser.add_argument('-b', '--num_beam_to_drop', help='number of beam to be dropped', type=int, default=8)
-    arguments = parser.parse_args()
-
-    return arguments
+    return parser.parse_args()
 
 
 

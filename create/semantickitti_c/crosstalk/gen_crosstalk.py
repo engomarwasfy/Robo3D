@@ -35,9 +35,7 @@ def parse_arguments():
                         default='./save_root/crosstalk/light')  # ['light','moderate','heavy']
     parser.add_argument('-p', '--percentage', help='crosstalk ratio', type=float, default=0.006)
 
-    arguments = parser.parse_args()
-
-    return arguments
+    return parser.parse_args()
 
 
 

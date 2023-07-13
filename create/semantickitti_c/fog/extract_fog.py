@@ -35,9 +35,7 @@ def get_recordings(split: str) -> List[str]:
 
     with open(f'{splits_folder / split}.txt') as csv_file:
         csv_reader = csv.reader(csv_file, delimiter=',')
-        for row in csv_reader:
-            recordings.append(f'{row[0]}_{row[1]}.png')
-
+        recordings.extend(f'{row[0]}_{row[1]}.png' for row in csv_reader)
     return sorted(recordings)
 
 
@@ -120,9 +118,7 @@ def filter_by_distance(pc: np.ndarray, min_dist: float = MIN_DIST, max_dist: flo
     pc = pc[min_dist_mask, :]
 
     max_dist_mask = np.linalg.norm(pc[:, 0:3], axis=1) < max_dist
-    pc = pc[max_dist_mask, :]
-
-    return pc
+    return pc[max_dist_mask, :]
 
 
 def filter_by_height(pc: np.ndarray, min_height: float = MIN_HEIGHT, max_height: float = MAX_HEIGHT) -> np.ndarray:
@@ -131,9 +127,7 @@ def filter_by_height(pc: np.ndarray, min_height: float = MIN_HEIGHT, max_height:
     pc = pc[min_height_mask, :]
 
     max_height_mask = pc[:, 2] < max_height
-    pc = pc[max_height_mask, :]
-
-    return pc
+    return pc[max_height_mask, :]
 
 
 if __name__ == '__main__':

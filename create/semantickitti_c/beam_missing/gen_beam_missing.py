@@ -43,9 +43,7 @@ def parse_arguments():
                         default='./save_root/beam_missing/light')  # ['light','moderate','heavy']
     parser.add_argument('-b', '--num_beam_to_drop', help='number of beam to be dropped', type=int, default=16)
 
-    arguments = parser.parse_args()
-
-    return arguments
+    return parser.parse_args()
 
 
 if __name__ == '__main__':

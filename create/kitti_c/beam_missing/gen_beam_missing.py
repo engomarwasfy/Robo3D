@@ -29,19 +29,17 @@ def get_kitti_ringID(points):
 
 def parse_arguments():
 
-    parser = argparse.ArgumentParser(description='LiDAR beam missing')
+        parser = argparse.ArgumentParser(description='LiDAR beam missing')
 
-    parser.add_argument('-c', '--n_cpus', help='number of CPUs that should be used', type=int, default= mp.cpu_count())
-    parser.add_argument('-f', '--n_features', help='number of point features', type=int, default=4)
-    parser.add_argument('-r', '--root_folder', help='root folder of dataset', type=str,
-                        default='./data_root/Kitti')
-    parser.add_argument('-d', '--dst_folder', help='savefolder of dataset', type=str,
-                        default='./save_root/beam_missing/light')  # ['light','moderate','heavy']
-    parser.add_argument('-b', '--num_beam_to_drop', help='number of beam to be dropped', type=int, default=16)
+        parser.add_argument('-c', '--n_cpus', help='number of CPUs that should be used', type=int, default= mp.cpu_count())
+        parser.add_argument('-f', '--n_features', help='number of point features', type=int, default=4)
+        parser.add_argument('-r', '--root_folder', help='root folder of dataset', type=str,
+                            default='./data_root/Kitti')
+        parser.add_argument('-d', '--dst_folder', help='savefolder of dataset', type=str,
+                            default='./save_root/beam_missing/light')  # ['light','moderate','heavy']
+        parser.add_argument('-b', '--num_beam_to_drop', help='number of beam to be dropped', type=int, default=16)
 
-    arguments = parser.parse_args()
-
-    return arguments
+        return parser.parse_args()
 
 
 if __name__ == '__main__':

@@ -216,8 +216,10 @@ def do_angles_intersect_particles(angles: np.ndarray, particle_centers: np.ndarr
 
     angle_differences = np.tile(angles, (1, N)) - np.tile(angle_to_centers.T, (M, 1))                           # (M, N)
 
-    answer = np.logical_or.reduce((np.abs(angle_differences) < PI/2,
-                                   np.abs(angle_differences - 2*PI) < PI/2,
-                                   np.abs(angle_differences + 2*PI) < PI/2))                                    # (M, N)
-
-    return answer
+    return np.logical_or.reduce(
+        (
+            np.abs(angle_differences) < PI / 2,
+            np.abs(angle_differences - 2 * PI) < PI / 2,
+            np.abs(angle_differences + 2 * PI) < PI / 2,
+        )
+    )

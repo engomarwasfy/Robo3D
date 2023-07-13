@@ -47,9 +47,13 @@ def rainfall_rate_to_snowfall_rate(rainfall_rate: float, terminal_velocity: floa
                                 > 2.5       heavy snow
     """
 
-    snowfall_rate = 487 * snowflake_density * snowflake_diameter * terminal_velocity * (rainfall_rate ** (2/3))
-
-    return snowfall_rate
+    return (
+        487
+        * snowflake_density
+        * snowflake_diameter
+        * terminal_velocity
+        * (rainfall_rate ** (2 / 3))
+    )
 
 
 def snowfall_rate_to_rainfall_rate(snowfall_rate: float, terminal_velocity: float,
@@ -64,9 +68,18 @@ def snowfall_rate_to_rainfall_rate(snowfall_rate: float, terminal_velocity: floa
     rainfall_rate:              Varies from 0.5 (slight rain) to 50 (violent shower)    [mm/h]
     """
 
-    rainfall_rate = np.sqrt((snowfall_rate / (487 * snowflake_density * snowflake_diameter * terminal_velocity))**3)
-
-    return rainfall_rate
+    return np.sqrt(
+        (
+            snowfall_rate
+            / (
+                487
+                * snowflake_density
+                * snowflake_diameter
+                * terminal_velocity
+            )
+        )
+        ** 3
+    )
 
 
 def sekhon_srivastava(precipitation_rate: float) -> float:
@@ -105,10 +118,10 @@ def dart_throwing(occupancy_ratio: float,
                                 ordinate of disk center and disk radius (in meters).
     """
 
-    if distribution == 'sekhon':
-        diameter_rate_parameter = sekhon_srivastava(precipitation_rate)
-    elif distribution == 'gunn':
+    if distribution == 'gunn':
         diameter_rate_parameter = gunn_marshall(precipitation_rate)
+    elif distribution == 'sekhon':
+        diameter_rate_parameter = sekhon_srivastava(precipitation_rate)
     else:
         raise NotImplementedError('Distribution model unknown.')
 
@@ -169,23 +182,20 @@ def dart_throwing(occupancy_ratio: float,
         # Check whether current particle overlaps with any particle that has already been sampled.
         sample_has_overlap = (samples[:, 0] - x) ** 2 + (samples[:, 1] - y) ** 2 <= (samples[:, 2] + disk_radius) ** 2
 
-        # If yes, reject the sample and continue.
         if np.any(sample_has_overlap):
             continue
 
-        else:
+        r_avg = (r_avg * i + disk_radius) / (i+1)
+        i += 1
 
-            r_avg = (r_avg * i + disk_radius) / (i+1)
-            i += 1
+        area = PI * disk_radius ** 2
+        area_occupied += area
+        samples = np.concatenate((samples, np.array([[x, y, disk_radius]])))
 
-            area = PI * disk_radius ** 2
-            area_occupied += area
-            samples = np.concatenate((samples, np.array([[x, y, disk_radius]])))
-
-            if pbar:
-                pbar.update(area * large_number)
-                pbar.set_postfix({'n_sampled': len(samples),
-                                  'r_avg': r_avg})
+        if pbar:
+            pbar.update(area * large_number)
+            pbar.set_postfix({'n_sampled': len(samples),
+                              'r_avg': r_avg})
 
     if pbar:
         pbar.n = total
@@ -234,7 +244,7 @@ def incidence_range_empirical_distribution(samples,
             sample = samples[j]
             x_center, y_center, radius = sample
 
-            if direction == PI/2 or direction == 3*PI/2:
+            if direction in [PI / 2, 3 * PI / 2]:
                 a, b, c = 1.0, 0.0, 0.0
             else:
                 a, b, c = tan_direction, -1.0, 0.0
@@ -245,7 +255,7 @@ def incidence_range_empirical_distribution(samples,
             # Check whether line that corresponds to current direction incides on current particle.
             if distance_from_sample_to_line <= radius:
                 # Solve the system of (line, circle) to identify their two points of intersection.
-                if direction == PI/2 or direction == 3*PI/2:
+                if direction in [PI / 2, 3 * PI / 2]:
                     x_intersection = np.array([0.0, 0.0])
                     y_intersection = np.array([y_center + np.sqrt(radius ** 2 - x_center ** 2),
                                                y_center - np.sqrt(radius ** 2 - x_center ** 2)])
@@ -284,7 +294,7 @@ def save_plot(samples: np.ndarray, R_0: float, string: str, scale_factor: int = 
 
     if scale_factor == 1:
         filename = f'{string}.svg'
-        plt.title(f'sampled particles', fontsize=150)
+        plt.title('sampled particles', fontsize=150)
     else:
         assert scale_factor > 1, 'scale_factor has to be bigger than or equal to 1'
         filename = f'{string}_({scale_factor}x_increased).svg'
@@ -307,11 +317,7 @@ def save_plot(samples: np.ndarray, R_0: float, string: str, scale_factor: int = 
     origin = plt.Circle((0, 0), 0.1, color='red')
     ax.add_patch(origin)
 
-    if show_progessbar:
-        pbar = tqdm(samples, desc='creating plot')
-    else:
-        pbar = samples
-
+    pbar = tqdm(samples, desc='creating plot') if show_progessbar else samples
     for sample in pbar:
         x, y, radius = sample
         circle = plt.Circle((x, y), scale_factor * radius)  # original radius is too small to be visualized

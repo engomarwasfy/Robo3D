@@ -30,9 +30,7 @@ def parse_arguments():
                         default='./save_root/motion_blur/light')  # ['light','moderate','heavy']
     parser.add_argument('-t', '--trans_std', help='jitter score', type=float, default=0.2)
 
-    arguments = parser.parse_args()
-
-    return arguments
+    return parser.parse_args()
 
 
 

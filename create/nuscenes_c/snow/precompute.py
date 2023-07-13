@@ -39,17 +39,16 @@ def get_fov_flag(pts_rect, img_shape, calib):
     val_flag_1 = np.logical_and(pts_img[:, 0] >= 0, pts_img[:, 0] < img_shape[1])
     val_flag_2 = np.logical_and(pts_img[:, 1] >= 0, pts_img[:, 1] < img_shape[0])
     val_flag_merge = np.logical_and(val_flag_1, val_flag_2)
-    pts_valid_flag = np.logical_and(val_flag_merge, pts_rect_depth >= 0)
-
-    return pts_valid_flag
+    return np.logical_and(val_flag_merge, pts_rect_depth >= 0)
 
 
 if __name__ == '__main__':
 
     assert SPLIT.exists(), f'{SPLIT} does not exist'
 
-    assert len(SNOWFALL_RATES) == len(TERMINAL_VELOCITIES), f'you need to provide an equal amount of ' \
-                                                            f'snowfall_rates and terminal velocities'
+    assert len(SNOWFALL_RATES) == len(
+        TERMINAL_VELOCITIES
+    ), 'you need to provide an equal amount of snowfall_rates and terminal velocities'
     rainfall_rates = []
     occupancy_ratios = []
 

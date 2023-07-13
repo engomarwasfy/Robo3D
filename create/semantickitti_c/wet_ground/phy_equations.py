@@ -121,9 +121,7 @@ def baryometric_sattering(ain, depth=0.002, nair=1.0003, nw=1.33, beta=0.001, he
 
     aout = np.arcsin(np.sin(ain) * nair / nw)
 
-    r = np.exp(-2 * beta * depth / np.cos(aout)) * np.cos(ain) ** 2
-
-    return r
+    return np.exp(-2 * beta * depth / np.cos(aout)) * np.cos(ain) ** 2
 
 
 def plot_frenel_equations(angles, x_axis, nair=1.0003, nw=1.33, equation=frenel_equations):
@@ -189,7 +187,7 @@ def plot_total_equations2(angles, x_axis, nair=1.0003, nw=1.33, rho=0.9, save_da
 def write_csv(name, x_data, y_data, label_file='undefined', folder='statistics_output'):
     if not os.path.exists(folder):
         os.makedirs(folder)
-    with open('%s/%s_%s.csv' % (folder, label_file, name), 'w', newline='') as csvfile:
+    with open(f'{folder}/{label_file}_{name}.csv', 'w', newline='') as csvfile:
         spamwriter = csv.writer(csvfile, delimiter=',',
                                 quotechar='|', quoting=csv.QUOTE_MINIMAL)
         x_data_append = ['x_data']

@@ -56,21 +56,18 @@ def ground_water_augmentation(pointcloud, water_height=0.0012, pavement_depth=0.
 
     if pointcloud_planes.shape[0] < 1000:
         return pointcloud, 0
-    
+
     if not flat_earth:
         # incident angle based on ground plane
         # calculate incident angle based on scalar product -> resulting in the cosine of the
         calculated_indicent_angle = np.arccos(np.divide(np.matmul(pointcloud_planes[:, :3], np.asarray(w)),
                                                         np.linalg.norm(pointcloud_planes[:, :3],
                                                                        axis=1) * np.linalg.norm(w)))
-    elif flat_earth:
+    else:
         # incident angle based on flat earth assumption
         calculated_indicent_angle = np.arccos(-np.divide(np.matmul(pointcloud_planes[:, :3], np.asarray([0, 0, 1])),
                                                          np.linalg.norm(pointcloud_planes[:, :3],
                                                                         axis=1) * np.linalg.norm([0, 0, 1])))
-    else:
-        assert False, 'flat earth tag has be bool'
-
     if debug:
         # flat earth assumption based on internal coordinate system
         plt.plot(np.linalg.norm(pointcloud_planes[:, :2], axis=1), calculated_indicent_angle * 180 / np.pi, 'x')
@@ -188,7 +185,7 @@ def ransac_polyfit(x, y, order=3, n=15, k=100, t=0.1, d=15, f=0.8):
 
     bestfit = np.polyfit(x, y, order)
     besterr = np.sum(np.abs(np.polyval(bestfit, x) - y))
-    for kk in range(k):
+    for _ in range(k):
         maybeinliers = np.random.randint(len(x), size=n)
         maybemodel = np.polyfit(x[maybeinliers], y[maybeinliers], order)
         alsoinliers = np.abs(np.polyval(maybemodel, x) - y) < t
@@ -254,10 +251,7 @@ def estimate_laser_parameters(pointcloud_planes, calculated_indicent_angle, powe
         adaptive_noise_threshold = noise_floor * (
                 pmin[0] * distance ** 2 + pmin[1] * distance + pmin[2])
     elif estimation_method == 'linear':
-        if len(min_vals) > 3:
-            pmin = linregress(x, min_vals)
-        else:
-            pmin = p
+        pmin = linregress(x, min_vals) if len(min_vals) > 3 else p
         adaptive_noise_threshold = noise_floor * (
                 pmin[0] * distance + pmin[1])
     # Guess that noise level should be half the road relfection
@@ -331,7 +325,7 @@ def get_ground_plane_intensity_stats(pointcloud, recording=None, road_wettness=0
 
         c = ax.pcolormesh(X, Y, cumsum.T, cmap='RdBu', vmin=z_min, vmax=z_max)
         if recording is not None:
-            ax.set_title(recording + ' wettness =' + str(road_wettness))
+            ax.set_title(f'{recording} wettness ={str(road_wettness)}')
         else:
             ax.set_title('pcolormesh')
         # set the limits of the plot to the limits of the data
@@ -353,12 +347,10 @@ def parse_arguments():
     parser.add_argument('-d', '--dst_folder', help='savefolder of dataset', type=str,
                         default='./save_root/wet_ground/light')  # ['light','moderate','heavy']
     parser.add_argument('-w', '--water_height', help='water height', type=float,
-                        default=0.0002) 
+                        default=0.0002)
     parser.add_argument('-n', '--noise_floor', help='noise floor', type=float,
-                        default=0.2) 
-    arguments = parser.parse_args()
-
-    return arguments
+                        default=0.2)
+    return parser.parse_args()
 
 
 
